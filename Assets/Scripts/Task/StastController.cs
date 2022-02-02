@@ -1,4 +1,5 @@
 ﻿using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -9,6 +10,7 @@ public class StastController : MonoBehaviour
     public static event Action<bool> CheckPrice; 
     [SerializeField] private Stash playerStash;
     [SerializeField] private Stash traderStash;
+    private Sequence sequence;
     private void Start()
     {
         MouseData.NeedSwapItem += SwapItem;
@@ -28,6 +30,9 @@ public class StastController : MonoBehaviour
                 playerStash.UpdateGUI();
                 traderStash.Money += int.Parse(MouseData.FromItem.PriceText.text);
                 traderStash.UpdateGUI();
+                sequence = DOTween.Sequence();
+                sequence.Append(MouseData.ToItem.transform.DOScale(Vector3.one * 1.2f, 0.3f));
+                sequence.Append(MouseData.ToItem.transform.DOScale(Vector3.one , 0.3f));
                 CheckPrice?.Invoke(true);
             }
         }
@@ -42,6 +47,8 @@ public class StastController : MonoBehaviour
                 traderStash.UpdateGUI();
                 playerStash.Money += int.Parse(MouseData.FromItem.PriceText.text);
                 playerStash.UpdateGUI();
+                sequence.Append(MouseData.ToItem.transform.DOScale(Vector3.one * 1.2f, 0.3f));
+                sequence.Append(MouseData.ToItem.transform.DOScale(Vector3.one, 0.3f));
                 CheckPrice?.Invoke(true);
             }
         }
