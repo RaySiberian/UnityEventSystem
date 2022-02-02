@@ -23,6 +23,7 @@ public class StastController : MonoBehaviour
             {
                 MouseData.ToItem.ItemImage.sprite = MouseData.FromItem.ItemImage.sprite;
                 MouseData.ToItem.PriceText.text = MouseData.FromItem.PriceText.text;
+                MouseData.ToItem.IsEmpty = false;
                 playerStash.Money -= int.Parse(MouseData.FromItem.PriceText.text);
                 playerStash.UpdateGUI();
                 traderStash.Money += int.Parse(MouseData.FromItem.PriceText.text);
@@ -36,6 +37,7 @@ public class StastController : MonoBehaviour
             {
                 MouseData.ToItem.ItemImage.sprite = MouseData.FromItem.ItemImage.sprite;
                 MouseData.ToItem.PriceText.text = MouseData.FromItem.PriceText.text;
+                MouseData.ToItem.IsEmpty = false;
                 traderStash.Money -= int.Parse(MouseData.FromItem.PriceText.text);
                 traderStash.UpdateGUI();
                 playerStash.Money += int.Parse(MouseData.FromItem.PriceText.text);

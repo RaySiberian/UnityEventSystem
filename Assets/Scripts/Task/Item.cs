@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler
+public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IEndDragHandler
 {
     public TextMeshProUGUI PriceText;
     public Image ItemImage;
@@ -27,15 +27,17 @@ public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragH
     public void OnPointerDown(PointerEventData eventData)
     {
         if (IsEmpty)
-        {
             return;
-        }
+        
         MouseData.LastPosition = transform.position;
         MouseData.FromItem = this;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (IsEmpty)
+            return;
+        
         GetComponent<CanvasGroup>().blocksRaycasts = false;
         GetComponent<Image>().raycastTarget = false;
     }
@@ -43,9 +45,8 @@ public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragH
     public void OnDrag(PointerEventData eventData)
     {
         if (IsEmpty)
-        {
             return;
-        }
+        
         GetComponent<RectTransform>().position = Input.mousePosition;
     }
     
@@ -54,29 +55,30 @@ public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragH
     {
         MouseData.ToItem = this;
 
+        if (MouseData.FromItem == null)
+        {
+            return;
+        }
+        
         if (MouseData.FromItem.InventoryType == MouseData.ToItem.InventoryType || MouseData.ToItem.IsEmpty == false)
         {
             ResetFromItem();
-            MouseData.ClearData();
             return;
         }
         
         MouseData.NeedSwapItem?.Invoke();
-        MouseData.ClearData();
     }
 
     private void AnswerCallBack(bool swaping)
     {
         if (swaping)
         {
+            SwapComplite();
             MouseData.FromItem.SetEmpty();
-            ResetFromItem();
         }
         else
         {
-            MouseData.FromItem.gameObject.transform.position = MouseData.LastPosition;
-            MouseData.FromItem.GetComponent<CanvasGroup>().blocksRaycasts = true;
-            MouseData.FromItem.GetComponent<Image>().raycastTarget = true;
+            ResetFromItem();
         }
     }
     
@@ -85,6 +87,11 @@ public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragH
         MouseData.FromItem.gameObject.transform.position = MouseData.LastPosition;
         MouseData.FromItem.GetComponent<CanvasGroup>().blocksRaycasts = true;
         MouseData.FromItem.GetComponent<Image>().raycastTarget = true;
+    }
+
+    private void SwapComplite()
+    {
+        ResetFromItem();
         if (MouseData.FromItem.InventoryType == InventoryType.Player)
         {
             MouseData.FromItem.InventoryType = InventoryType.Trader;
@@ -106,5 +113,14 @@ public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragH
     public void OnPointerExit(PointerEventData eventData)
     {
         transform.localScale = Vector3.one;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (MouseData.ToItem == null)
+        {
+            ResetFromItem();
+        }
+        MouseData.ClearData();
     }
 }
