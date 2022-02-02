@@ -107,7 +107,10 @@ public class Item : MonoBehaviour, IPointerDownHandler,IBeginDragHandler, IDragH
     //Анимации
     public void OnPointerEnter(PointerEventData eventData)
     {
-        transform.localScale = Vector3.one * 1.3f; 
+        if (!gameObject.GetComponent<Item>().IsEmpty)
+        {
+            transform.localScale = Vector3.one * 1.3f; 
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
